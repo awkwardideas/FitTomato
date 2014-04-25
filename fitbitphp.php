@@ -2003,6 +2003,174 @@ class FitBitPHP
             throw new FitBitException($responseInfo['http_code'], 'Fitbit request failed. Code: ' . $responseInfo['http_code']);
         }
     }
+	
+	
+	/**
+     * Get list of alarms for a device
+     *
+     * @throws Exception
+	 * @param string $deviceID ID of the device
+     * @return mixed SimpleXMLElement or the value encoded in json as an object
+     */
+    public function getAlarms($deviceID)
+    {
+		$headers = $this->getHeaders();
+        try {
+            $this->oauth->fetch($this->baseApiUrl . "user/-/devices/tracker/$deviceID/alarms." . $this->responseFormat, null, OAUTH_HTTP_METHOD_GET, $headers);
+        } catch (Exception $E) {
+        }
+	
+		$response = $this->oauth->getLastResponse();
+        $responseInfo = $this->oauth->getLastResponseInfo();
+        if (!strcmp($responseInfo['http_code'], '200')) {
+            $response = $this->parseResponse($response);
+
+            if ($response)
+                return $response;
+            else
+                throw new FitBitException($responseInfo['http_code'], 'Fitbit request failed. Code: ' . $responseInfo['http_code']);
+        } else {
+            throw new FitBitException($responseInfo['http_code'], 'Fitbit request failed. Code: ' . $responseInfo['http_code']);
+        }
+    }
+
+	
+	/**
+     * Add an alarm for a device
+     *
+     * @throws Exception
+	 * @param string $deviceID ID of the device
+	 * @param DateTime $time Log entry date (set proper timezone, which could be fetched via getProfile)
+	 * @param boolean $enabled Alarm Enabled?
+	 * @param boolean $recurring Repeat the Alarm?
+	 * @param array $days Days that the alarm is active, only for recurring
+	 * @param string $label	Label for the Alarm
+	 * @param integer $snoozeLength Minutes between alarms
+	 * @param integer $snoozeCount Maximum snooze count
+	 * @param string $vibe Vibe Pattern (not currently active)
+     * @return mixed SimpleXMLElement or the value encoded in json as an object
+     */
+    public function addAlarm($deviceID, $time, $enabled, $recurring, $days=null, $label=null, $snoozeLength=null, $snoozeCount=null, $vibe=null)
+    {
+		$parameters = array();
+		$parameters['time'] = $time->format('H:iO');
+		$parameters['enabled'] = ($enabled) ? 1 : 0;
+		$parameters['recurring'] = ($recurring) ? 1 : 0;
+		if($recurring==null){
+			$parameters['weekDays'] = ["MONDAY","TUESDAY","WEDNESDAY","THURSDAY","FRIDAY","SATURDAY","SUNDAY"];
+		}else{
+			$parameters['weekDays'] = $days;
+		}
+		if ($label!=null)
+			$parameters['label'] = $label;
+		if ($snoozeLength!=null)
+			$parameters['snoozeLength'] = $snoozeLength;
+		if ($snoozeCount!=null)
+			$parameters['snoozeCount'] = $snoozeCount;
+		if ($vibe!=null)
+			$parameters['vibe'] = $vibe;
+
+		$headers = $this->getHeaders();
+        try {
+            $this->oauth->fetch($this->baseApiUrl . "/user/-/devices/tracker/$deviceID/alarms." . $this->responseFormat, $parameters, OAUTH_HTTP_METHOD_POST, $headers);
+        } catch (Exception $E) {
+        }
+		$response = $this->oauth->getLastResponse();
+        $responseInfo = $this->oauth->getLastResponseInfo();
+        if (!strcmp($responseInfo['http_code'], '201')) {
+            return $this->parseResponse($response);
+        } else {
+            $response = $this->parseResponse($response);
+
+            if (!$response)
+                throw new FitBitException($responseInfo['http_code'], 'Fitbit request failed. Code: ' . $responseInfo['http_code']);
+            else
+                throw new FitBitException($responseInfo['http_code'], $response->message, 'Fitbit request failed. Code: ' . $responseInfo['http_code']);
+        }
+    }
+	
+	
+	/**
+     * Update an alarm for a device
+     *
+     * @throws Exception
+	 * @param string $deviceID ID of the device
+	 * @param string $alarmID ID of the alarm
+	 * @param DateTime $time Log entry date (set proper timezone, which could be fetched via getProfile)
+	 * @param boolean $enabled Alarm Enabled?
+	 * @param boolean $recurring Repeat the Alarm?
+	 * @param array $days Days that the alarm is active, only for recurring
+	 * @param integer $snoozeLength Minutes between alarms
+	 * @param integer $snoozeCount Maximum snooze count
+	 * @param string $label	Label for the Alarm
+	 * @param string $vibe Vibe Pattern (not currently active)
+     * @return mixed SimpleXMLElement or the value encoded in json as an object
+     */
+    public function updateAlarm($deviceID, $alarmID, $time, $enabled, $recurring, $days, $snoozeLength, $snoozeCount, $label=null, $vibe=null)
+    {
+		$parameters = array();
+		$parameters['time'] = $time->format('H:iO');
+		$parameters['enabled'] = ($enabled) ? 1 : 0;
+		$parameters['recurring'] = ($recurring) ? 1 : 0;
+		
+		if($recurring==null){
+			$parameters['weekDays'] = ["MONDAY","TUESDAY","WEDNESDAY","THURSDAY","FRIDAY","SATURDAY","SUNDAY"];
+		}else{
+			$parameters['weekDays'] = $days;
+		}
+			
+		$parameters['snoozeLength'] = $snoozeLength;
+			
+		$parameters['snoozeCount'] = $snoozeCount;
+			
+		if ($label!=null)
+			$parameters['label'] = $label;
+		
+		if ($vibe!=null)
+			$parameters['vibe'] = $vibe;
+		
+		$headers = $this->getHeaders();
+        try {
+            $this->oauth->fetch($this->baseApiUrl . "/user/-/devices/tracker/$deviceID/alarms/$alarmID." . $this->responseFormat, $parameters, OAUTH_HTTP_METHOD_POST, $headers);
+        } catch (Exception $E) {
+        }
+		$response = $this->oauth->getLastResponse();
+        $responseInfo = $this->oauth->getLastResponseInfo();
+        if (!strcmp($responseInfo['http_code'], '200')) {
+            $response = $this->parseResponse($response);
+
+            if ($response)
+                return $response;
+            else
+                throw new FitBitException($responseInfo['http_code'], 'Fitbit request failed. Code: ' . $responseInfo['http_code']);
+        } else {
+            throw new FitBitException($responseInfo['http_code'], 'Fitbit request failed. Code: ' . $responseInfo['http_code']);
+        }
+    }
+	
+	
+	/**
+     * Delete an alarm for a device
+     *
+     * @throws Exception
+	 * @param string $deviceID ID of the device
+	 * @param string $alarmID ID of the alarm
+     * @return mixed SimpleXMLElement or the value encoded in json as an object
+     */
+    public function deleteAlarm($deviceID, $alarmID)
+    {
+		$headers = $this->getHeaders();
+        try {
+            $this->oauth->fetch($this->baseApiUrl . "/user/-/devices/tracker/$deviceID/alarms/$alarmID." . $this->responseFormat, null, OAUTH_HTTP_METHOD_DELETE, $headers);
+        } catch (Exception $E) {
+        }
+        $responseInfo = $this->oauth->getLastResponseInfo();
+        if (!strcmp($responseInfo['http_code'], '204')) {
+            return true;
+        } else {
+            throw new FitBitException($responseInfo['http_code'], 'Fitbit request failed. Code: ' . $responseInfo['http_code']);
+        }
+    }
 
     /**
      * Get user friends
