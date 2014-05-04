@@ -55,14 +55,16 @@ class FitBitPHP
      * @param string $user_agent User-agent to use in API calls
      * @param string $response_format Response format (json or xml) to use in API calls
      */
-    public function __construct($consumer_key, $consumer_secret, $debug = 1, $user_agent = null, $response_format = 'xml')
+    public function __construct($consumer_key, $consumer_secret, $debug = 1, $user_agent = null, $response_format = 'xml', $verifySSL=1)
     {
         $this->initUrls();
 
         $this->consumer_key = $consumer_key;
         $this->consumer_secret = $consumer_secret;
         $this->oauth = new OAuth($consumer_key, $consumer_secret, OAUTH_SIG_METHOD_HMACSHA1, OAUTH_AUTH_TYPE_AUTHORIZATION);
-		
+	if(!$verifySSL)
+            $this->oauth->disableSSLChecks();
+        
         $this->debug = $debug;
         if ($debug)
             $this->oauth->enableDebug();
@@ -150,10 +152,10 @@ class FitBitPHP
         if (empty($session)) {
             session_start();
         }
-        if (empty($_SESSION[$this->session_key]['fitbit_Session']))
-            $_SESSION[$this->session_key]['fitbit_Session'] = 0;
+        if (empty($_SESSION['fitbit_Session']))
+            $_SESSION['fitbit_Session'] = 0;
 
-        return (int)$_SESSION[$this->session_key]['fitbit_Session'];
+        return (int)$_SESSION['fitbit_Session'];
     }
 
     /**
@@ -171,38 +173,38 @@ class FitBitPHP
             session_start();
         }
 
-        if (empty($_SESSION[$this->session_key]['fitbit_Session']))
-            $_SESSION[$this->session_key]['fitbit_Session'] = 0;
+        if (empty($_SESSION['fitbit_Session']))
+            $_SESSION['fitbit_Session'] = 0;
 
 
-        if (!isset($_GET['oauth_token']) && $_SESSION[$this->session_key]['fitbit_Session'] == 1)
-            $_SESSION[$this->session_key]['fitbit_Session'] = 0;
+        if (!isset($_GET['oauth_token']) && $_SESSION['fitbit_Session'] == 1)
+            $_SESSION['fitbit_Session'] = 0;
 
 
-        if ($_SESSION[$this->session_key]['fitbit_Session'] == 0) {
+        if ($_SESSION['fitbit_Session'] == 0) {
 
             $request_token_info = $this->oauth->getRequestToken($this->requestTokenUrl, $callbackUrl);
 
-            $_SESSION[$this->session_key]['fitbit_Secret'] = $request_token_info['oauth_token_secret'];
-            $_SESSION[$this->session_key]['fitbit_Session'] = 1;
+            $_SESSION['fitbit_Secret'] = $request_token_info['oauth_token_secret'];
+            $_SESSION['fitbit_Session'] = 1;
 
             header('Location: ' . $this->authUrl . '?oauth_token=' . $request_token_info['oauth_token']);
             exit;
 
-        } else if ($_SESSION[$this->session_key]['fitbit_Session'] == 1) {
+        } else if ($_SESSION['fitbit_Session'] == 1) {
 
-            $this->oauth->setToken($_GET['oauth_token'], $_SESSION[$this->session_key]['fitbit_Secret']);
+            $this->oauth->setToken($_GET['oauth_token'], $_SESSION['fitbit_Secret']);
             $access_token_info = $this->oauth->getAccessToken($this->accessTokenUrl);
 
-            $_SESSION[$this->session_key]['fitbit_Session'] = 2;
-            $_SESSION[$this->session_key]['fitbit_Token'] = $access_token_info['oauth_token'];
-            $_SESSION[$this->session_key]['fitbit_Secret'] = $access_token_info['oauth_token_secret'];
+            $_SESSION['fitbit_Session'] = 2;
+            $_SESSION['fitbit_Token'] = $access_token_info['oauth_token'];
+            $_SESSION['fitbit_Secret'] = $access_token_info['oauth_token_secret'];
 
-            $this->setOAuthDetails($_SESSION[$this->session_key]['fitbit_Token'], $_SESSION[$this->session_key]['fitbit_Secret']);
+            $this->setOAuthDetails($_SESSION['fitbit_Token'], $_SESSION['fitbit_Secret']);
             return 1;
 
-        } else if ($_SESSION[$this->session_key]['fitbit_Session'] == 2) {
-            $this->setOAuthDetails($_SESSION[$this->session_key]['fitbit_Token'], $_SESSION[$this->session_key]['fitbit_Secret']);
+        } else if ($_SESSION['fitbit_Session'] == 2) {
+            $this->setOAuthDetails($_SESSION['fitbit_Token'], $_SESSION['fitbit_Secret']);
             return 2;
         }
     }
@@ -215,7 +217,7 @@ class FitBitPHP
      */
     public function resetSession()
     {
-        $_SESSION[$this->session_key]['fitbit_Session'] = 0;
+        $_SESSION['fitbit_Session'] = 0;
     }
 
 

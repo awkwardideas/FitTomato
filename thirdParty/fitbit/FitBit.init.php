@@ -17,11 +17,11 @@ class Fitbit{
 	
 	function __construct(){
 		
-		$fitbit = new FitBitPHP( self::FITBIT_KEY, self::FITBIT_SECRET, 0, null, 'json');
+		$fitbit = new FitBitPHP( self::FITBIT_KEY, self::FITBIT_SECRET, 0, null, 'json', 0);
 		$fitbit->initSession('http://' . $_SERVER['HTTP_HOST'] ."/authorize");
 		$this->fitbitHandler = $fitbit;
 		
-		if( isset( $_SESSION[$session_key] ) )
+		if( isset( $_SESSION['fitbit_Session'] ) )
 			$this->Auth();
 			
 		if( !isset($this->activeDevice) && !isset($_SESSION['deviceID'])){
@@ -63,7 +63,7 @@ class Fitbit{
 	}
 	
 	function IsAuthenticated(){
-		if($_SESSION["fitbit"]['fitbit_Session']==2 && $this->Get_oAuth_Token() != "" && $this->Get_oAuth_Verifier() !=""){
+		if($_SESSION['fitbit_Session']==2 && $this->Get_oAuth_Token() != "" && $this->Get_oAuth_Verifier() !=""){
 			return true;
 		}else{
 			return false;
