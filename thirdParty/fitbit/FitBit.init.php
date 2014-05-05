@@ -28,14 +28,6 @@ class Fitbit{
         if( !isset($this->activeDevice) && !isset($_SESSION['deviceID'])){
             $devices = $fitbit->getDevices();
             $this->PromptDevices($devices);
-        }else{
-            //print_r($this->GetAlarms($_SESSION['deviceID']));	
-            //print "<br/>";
-            //print_r($this->SetAlarm(25));
-            //print_r($this->UpdateAlarm(17032885, 5));
-            //print_r($this->DeleteAlarm(17032885));
-            //print "<br/>";
-            //print_r($this->GetAlarms($_SESSION['deviceID']));	
         }
     }
 
@@ -131,13 +123,13 @@ class Fitbit{
         $devices = $this->FindQualifiedDevices($devices);
 
         if(count($devices) == 0){
-            print "No qualified devices found.  Must have a Fitbit Flex, Fitbit Force or Fitbit One to use this application.";
+            //print "No qualified devices found.  Must have a Fitbit Flex, Fitbit Force or Fitbit One to use this application.";
             $this->EndSession();
         }else if(count($devices) == 1){
-            print "One device found, set as active device: " . $devices[0]->id;
+            //print "One device found, set as active device: " . $devices[0]->id;
             $this->SetActiveDeviceID($devices[0]->id);
         }else{
-            print "Too many qualified devices found.";
+            //print "Too many qualified devices found.";
             print_r($devices);
         }
     }
@@ -158,7 +150,7 @@ class Fitbit{
     function VerifyAlarm($alarmID){
         $alarms = $this->GetAlarms();
         foreach($alarms->trackerAlarms as $alarm){
-            if($alarm->alarmId == $alarmID){
+            if($alarm->alarmId == $alarmID && $alarm->enabled){
                 return true;
             }
         }
@@ -240,7 +232,7 @@ class Fitbit{
         }
         if($success) $message="Alarm Started";
         
-        return json_encode(['success'=>$success, 'message'=>$message]);
+        return json_encode(['success'=>$success, 'message'=>$message,'alarmID'=>$this->GetActiveAlarmID()]);
     }
     
     function StopAlarm(){
@@ -261,13 +253,35 @@ class Fitbit{
         return json_encode(['success'=>$success, 'message'=>$message]);
     }
     
-    function CheckExistingAlarm(){
+    function CheckSync(){
         if($this->GetActiveAlarmID()){
             $alarms = $this->GetAlarms();
-            print_r($alarms);
             foreach($alarms->trackerAlarms as $alarm){
-                if($alarm->alarmId == $alarmID && $alarm->enabled){
-                    return json_encode(['success'=>true, 'message'=>'There is currently an active alarm', 'time'=>$alarm->time, 'synced'=>$alarm->syncedToDevice]);
+                if($alarm->alarmId == $this->GetActiveAlarmID() && $alarm->enabled && $alarm->syncedToDevice){
+                    return json_encode([
+                            'success'=>true,
+                            'message'=>'The alarm is currently synced to the device',
+                            'isSynced'=>$alarm->syncedToDevice,
+                            'alarmID'=>$alarm->alarmId
+                    ]);
+                }
+            }
+        }
+        return json_encode(['success'=>false, 'message'=>'There is currently not an active alarm']);
+    }
+    
+    function CheckAlarm(){
+        if($this->GetActiveAlarmID()){
+            $alarms = $this->GetAlarms();
+            foreach($alarms->trackerAlarms as $alarm){
+                if($alarm->alarmId == $this->GetActiveAlarmID() && $alarm->enabled){
+                    return json_encode([
+                        'success'=>true, 
+                        'message'=>'There is currently an active alarm', 
+                        'time'=>$alarm->time, 
+                        'alarmID'=>$alarm->alarmId, 
+                        'isSynced'=>$alarm->syncedToDevice
+                    ]);
                 }
             }
         }
