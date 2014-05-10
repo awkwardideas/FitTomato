@@ -47,7 +47,9 @@
         <div class="collapse navbar-collapse">
           <ul class="nav navbar-nav">
             <li <?php if($page=="home"){?>class="active"<?php } ?>><a href="/">Home</a></li>
-            <li <?php if($page=="about"){?>class="active"<?php } ?>><a href="/about">About</a></li>
+            <li <?php if($page=="pomodoro"){?>class="active"<?php } ?>><a href="/pomodoro">What is Pomodoro?</a></li>
+            <li <?php if($page=="fitbit"){?>class="active"<?php } ?>><a href="/fitbit">What is Fitbit?</a></li>
+            <li <?php if($page=="about"){?>class="active"<?php } ?>><a href="/about">What is FitTomato?</a></li>
           </ul>
           <div class="pull-right">
             <?php if(!(isset($fitbit) && $fitbit->IsAuthenticated())){?>

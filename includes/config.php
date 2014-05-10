@@ -1,6 +1,6 @@
 <?php
     define('SITE_NAME', 'FitTomato');
-    define('SITE_URL', 'http:\\fittomato.awkwardideas.com');
+    define('SITE_URL', 'http:\\fittomato.com');
 
     $page="home";
     $renderPage=true;            
@@ -14,6 +14,12 @@
         switch($url[0]){
             case 'about':
                 $page="about";
+                break;
+            case 'pomodoro':
+                $page="pomodoro";
+                break;
+            case 'fitbit':
+                $page="fitbit";
                 break;
             case 'authorize':
                 $fitbit->StartSession();				

@@ -2,7 +2,7 @@
         <small>
             <p class="disclaimer text-muted">The use of third-party trademarks on this site is intended to imply neither any endorsement by nor any affiliation with the respective trademark owners.</p>
             <p class="disclaimer text-muted">Pomodoro Technique&reg; and Pomodoro&reg; are registered trademarks of Francesco Cirillo.</p>
-            <p class="disclaimer text-muted">Fitbit is a registered trademark and service mark of Fitbit, Inc. <?php echo SITE_NAME; ?> is designed for use with the Fitbit platform. This product is not put out by Fitbit, and Fitbit does not service or warrant the functionality of this product.</p>
+            <p class="disclaimer text-muted">Fitbit and the Fitbit logo(s) are trademarks of Fitbit, Inc. <?php echo SITE_NAME; ?> is designed for use with the Fitbit platform. This product is not put out by Fitbit, and Fitbit does not service or warrant the functionality of this product.</p>
         </small>
         <p>&copy; Awkward Ideas 2014</p>       
     </div>

@@ -19,19 +19,17 @@ class Fitbit{
     function __construct(){
 
         $fitbit = new FitBitPHP( self::FITBIT_KEY, self::FITBIT_SECRET, 0, null, 'json', 0);
-        $fitbit->initSession('http://' . $_SERVER['HTTP_HOST'] ."/authorize");
         $this->fitbitHandler = $fitbit;
 
         if( isset( $_SESSION['fitbit_Session'] ) )
             $this->ContinueSession();
 
-        if( !isset($this->activeDevice) && !isset($_SESSION['deviceID'])){
-            $devices = $fitbit->getDevices();
-            $this->PromptDevices($devices);
-        }
     }
 
     function StartSession(){
+        $fitbit = $this->fitbitHandler;
+        $fitbit->initSession('http://' . $_SERVER['HTTP_HOST'] ."/authorize");
+        
         if( isset($_GET['oauth_token']) || isset($_GET['oauth_verifier'])){
             if( isset($_GET['oauth_token'])){
                 $this->Set_oAuth_Token($_GET['oauth_verifier']);
@@ -44,6 +42,13 @@ class Fitbit{
     }
 
     function ContinueSession(){
+        $fitbit = $this->fitbitHandler;
+        $fitbit->initSession('http://' . $_SERVER['HTTP_HOST'] ."/authorize");
+        if( !isset($this->activeDevice) && !isset($_SESSION['deviceID'])){
+            $devices = $fitbit->getDevices();
+            $this->PromptDevices($devices);
+        }
+        
         if( isset($_GET['oauth_token']) || isset($_GET['oauth_verifier'])){
             if( isset($_GET['oauth_token'])){
                 $this->Set_oAuth_Token($_GET['oauth_verifier']);
@@ -72,7 +77,7 @@ class Fitbit{
     }
 
     function IsAuthenticated(){
-        if($_SESSION['fitbit_Session']==2 && $this->Get_oAuth_Token() != "" && $this->Get_oAuth_Verifier() !=""){
+        if(isset($_SESSION['fitbit_Session']) && $_SESSION['fitbit_Session']==2 && $this->Get_oAuth_Token() != "" && $this->Get_oAuth_Verifier() !=""){
             return true;
         }else{
             return false;
