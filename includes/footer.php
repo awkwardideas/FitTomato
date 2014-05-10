@@ -14,6 +14,7 @@
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
 	<script type="text/javascript" src="/assets/js/bootstrap.min.js"></script>
+        <script type="text/javascript" src="/assets/js/bootstrap-message.js"></script>
 	<script type="text/javascript" src="/assets/js/flipclock.min.js"></script>
         <script src="/assets/js/custom.js"></script>
 	<script>

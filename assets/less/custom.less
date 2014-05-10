@@ -1,33 +1,36 @@
 @import url("../fonts/Digital-dream/stylesheet.css");
 @import "variables";
 
-.navbar-nav li.active:after {
-content: "";
-width: 0;
-height: 0;
-position: absolute;
-left: 50%;
-margin-left: -25px;
-border-width: 25px;
-border-style: solid outset outset;
-border-color: @brand-secondary transparent transparent;
-}
+@media (min-width:768px){
+    .navbar-nav li.active:after {
+        content: "";
+        width: 0;
+        height: 0;
+        position: absolute;
+        left: 50%;
+        margin-left: -25px;
+        border-width: 25px;
+        border-style: solid outset outset;
+        border-color: @brand-secondary transparent transparent;
+    }
 
-.auth-btn{
-    font-size: 16px;
-    padding: 15px 21px;
-    line-height: 23px;
-    font-weight: 700;
+    .auth-btn{
+        font-size: 16px;
+        padding: 15px 21px;
+        line-height: 23px;
+        font-weight: 700;
+    }
+        
+    .footer{
+            margin-top:50px;
+    }
+
 }
 .alizarin{
     color: @alizarin;
 }
 .products .col-lg-4{
 	text-align:center;
-}
-
-.footer{
-	margin-top:50px;
 }
 
 .digital{

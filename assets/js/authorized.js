@@ -2,8 +2,11 @@ console.log = (console.log) ? console.log : function() {};
 var clock;
 var timeSet = 1500;
 var alarmID = null;
+var bootstrapMsg;
+var visibilityLost = false;
 
 $(function(){
+    bootstrapMsg = new Bootstrap_Messages();
     $('.options .btn').button();
     $('.options .btn').click(function(){
         setTimer($(this).find("input").attr("data-time-value"));
@@ -15,7 +18,8 @@ $(function(){
         autoStart: false
     });
     
-    checkForRunningAlarm();
+    checkForRunningAlarm(true);
+    monitorVisibility();
 });
 
 function updateSync(isSynced){
@@ -47,6 +51,7 @@ function startTimer(){
         });
         request.done(function(result) {
             if(result.success){
+                bootstrapMsg.addSuccess("Silent alarm added to Fitbit");
                 clock.start();
                 alarmID=result.alarmID;
                 updateSync(false);
@@ -54,7 +59,7 @@ function startTimer(){
             }
         });
         request.fail(function( jqXHR, textStatus ) {
-            console.log( "Request failed: " + textStatus );
+            bootstrapMsg.addWarning("Alarm did not start successfully");
             return false;
         });
     }
@@ -72,11 +77,13 @@ function stopTimer(){
         request.done(function(result) {
             if(result.success){
                 clock.stop();
+                bootstrapMsg.addSuccess("Silent alarm deleted on Fitbit");
                 alarmID=null;
             }
         });
         request.fail(function( jqXHR, textStatus ) {
-            console.log( "Request failed: " + textStatus );
+            //console.log( "Request failed: " + textStatus );
+            bootstrapMsg.addWarning("Alarm did not stop successfully");
             return false;
         });
     }
@@ -92,7 +99,7 @@ function setTimer(time){
     resetTimer();
 }
 
-function checkForRunningAlarm(){
+function checkForRunningAlarm(newLoad){
     var requestURL = "/check";
         
     var request = $.ajax({
@@ -102,6 +109,11 @@ function checkForRunningAlarm(){
     });
     request.done(function(result) {
         if(result.success){
+            if(newLoad){
+                bootstrapMsg.addSuccess("Continuing running alarm");
+            }else{
+                bootstrapMsg.addSuccess("Synced clock with running alarm");
+            }
             alarmID=result.alarmID;
             updateSync(result.isSynced);
             var nowTime = new Date();
@@ -133,14 +145,19 @@ function checkForRunningAlarm(){
                 clock.start();
                 stopTimer();
             }else{
-                clock.setTime(diff);
+                clock.setTime(diff-1); //diff-1 to account for javascript delay
                 clock.start();
                 checkIfAlarmIsSynced();
             }            
         }
     });
     request.fail(function( jqXHR, textStatus ) {
-        console.log( "Request failed: " + textStatus );
+        if(newLoad){
+            bootstrapMsg.addDanger("Error looking for running alarm");
+        }else{
+            bootstrapMsg.addDanger("Error trying to re-sync alarm");
+        }
+        
         return false;
     });
 }
@@ -162,13 +179,15 @@ function checkIfAlarmIsSynced(){
             if(result.success){
                 if(result.isSynced){
                     updateSync(true);
+                    checkForRunningAlarm(false);
+                    bootstrapMsg.addSuccess("Alarm is synced");
                 }else{
                     checkIfAlarmIsSynced();
                 }
             }
         });
         request.fail(function( jqXHR, textStatus ) {
-            console.log( "Request failed: " + textStatus );
+            bootstrapMsg.addWarning("Unable to detect if alarm is synced");
             return false;
         });
     }, waitTime);
@@ -197,8 +216,6 @@ function secondsDiffConvertTimezones(time1, offset1, time2, offset2){
 }
 
 function secondsDiff(time1, time2){
-    console.log(time1);
-    console.log(time2);
     var t1 = timeToSeconds(time1);
     var t2 = timeToSeconds(time2);
     return t1 - t2;
@@ -236,3 +253,40 @@ function timeToSeconds(time){
     var minutes = (hours*60) + minutes;
     return minutes * 60 + seconds;   
 }
+
+function monitorVisibility(){
+    vis(function(){
+        if(vis()){
+            if(visibilityLost){
+                visibilityLost=false;
+                setTimeout(function(){            
+                    checkForRunningAlarm(false);
+                },300);		
+            }
+        } else {
+            visibilityLost=true;
+        }
+    });
+}
+
+//Visibility Tester
+var vis = (function(){
+    var stateKey, 
+        eventKey, 
+        keys = {
+                hidden: "visibilitychange",
+                webkitHidden: "webkitvisibilitychange",
+                mozHidden: "mozvisibilitychange",
+                msHidden: "msvisibilitychange"
+    };
+    for (stateKey in keys) {
+        if (stateKey in document) {
+            eventKey = keys[stateKey];
+            break;
+        }
+    }
+    return function(c) {
+        if (c) document.addEventListener(eventKey, c);
+        return !document[stateKey];
+    }
+})();
