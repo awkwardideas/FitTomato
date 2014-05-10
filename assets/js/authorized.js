@@ -19,6 +19,7 @@ $(function(){
     });
     
     checkForRunningAlarm(true);
+    window.onfocus = function(){checkForRunningAlarm(false)};
     monitorVisibility();
 });
 
