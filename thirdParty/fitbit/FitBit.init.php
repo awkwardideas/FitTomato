@@ -56,13 +56,16 @@ class Fitbit{
     }
 
     function EndSession(){
-        if($this->GetActiveDeviceID!=null){
-            $this->DeleteAlarm($this->GetActiveDeviceID);
+        if($this->GetActiveDeviceID() != null && $this->GetActiveAlarmID() != null){
+            $this->DeleteAlarm($this->GetActiveAlarmID());
+            $this->UnsetActiveAlarmID();
+        }
+        if($this->GetActiveDeviceID() != null){
             $this->UnsetActiveDeviceID();
         }
         $fitbit = $this->fitbitHandler;
+        $_SESSION['fitbit_Session']=0;
         $fitbit->resetSession();
-        session_destroy();
         $this->Set_oAuth_Token("");
         $this->Set_oAuth_Verifier("");
     }

@@ -1,8 +1,8 @@
 //Requires jQuery and Bootstrap
 var Bootstrap_Messages = (function() {
 	// "Private" variables
-	var _messages;
-	        
+	var delayTime = 5000;        
+                
 	// constructor
 	function Bootstrap_Messages(){
             if($(".bootstrap-message-container").length == 0){
@@ -13,6 +13,9 @@ var Bootstrap_Messages = (function() {
 		
 	}
 	
+        Bootstrap_Messages.prototype.setDelay = function(delay){
+		delayTime = delay;
+	}
         
 	Bootstrap_Messages.prototype.addSuccess = function(msg){
 		this.addMessage(msg,"success");
@@ -34,7 +37,7 @@ var Bootstrap_Messages = (function() {
 		var msgBox = $("<div/>").addClass("alert alert-dismissable alert-"+type);
                 var msgDismiss = $("<button/>").addClass("close").attr("type","button").attr("data-dismiss","alert").attr("aria-hidden","true").html("&times;").appendTo(msgBox);
                 $(msgBox).append(msg);
-		$(msgBox).appendTo(".bootstrap-message-container").delay(8000).animate(
+		$(msgBox).appendTo(".bootstrap-message-container").delay(delayTime).animate(
 			{opacity: .01},
 			'normal',
 			function() {

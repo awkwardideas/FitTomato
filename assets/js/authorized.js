@@ -82,7 +82,6 @@ function stopTimer(){
             }
         });
         request.fail(function( jqXHR, textStatus ) {
-            //console.log( "Request failed: " + textStatus );
             bootstrapMsg.addWarning("Alarm did not stop successfully");
             return false;
         });
@@ -137,8 +136,6 @@ function checkForRunningAlarm(newLoad){
             }else{
                 diff = secondsDiffConvertTimezones(alarmTime, alarmOffset, currentTime, hourOffset);
             }
-            
-            //console.log(diff);
             
             if(diff<0){
                 //If the alarm has passed delete the alarm
@@ -258,10 +255,7 @@ function monitorVisibility(){
     vis(function(){
         if(vis()){
             if(visibilityLost){
-                visibilityLost=false;
-                setTimeout(function(){            
-                    checkForRunningAlarm(false);
-                },300);		
+                checkForRunningAlarm(false);
             }
         } else {
             visibilityLost=true;
