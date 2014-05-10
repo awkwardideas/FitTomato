@@ -3,8 +3,10 @@ require_once( 'thirdParty/fitbit/FitBitPHP.php' );
 
 class Fitbit{
 
-    const FITBIT_KEY = "c8cf145b20014baa9456c0d13f7c9ea8"; //fea407e2274949ca8d203987d50d156c";
-    const FITBIT_SECRET = "afe4c2eddfbf4390bb31726efdf5c2b3"; //3bff1b5a660c46b5bf89e3a87530ece5";
+    const FITBIT_KEY = "fea407e2274949ca8d203987d50d156c";
+    const FITBIT_SECRET = "3bff1b5a660c46b5bf89e3a87530ece5";
+    //const FITBIT_KEY = "c8cf145b20014baa9456c0d13f7c9ea8";
+    //const FITBIT_SECRET = "afe4c2eddfbf4390bb31726efdf5c2b3";
     const FITBIT_REQUEST_TOKEN_URL = "https://api.fitbit.com/oauth/request_token";
     const FITBIT_REQUEST_ACCESS_URL = "https://api.fitbit.com/oauth/access_token";
     const FITBIT_AUTHORIZE = "https://www.fitbit.com/oauth/authorize";
