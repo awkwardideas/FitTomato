@@ -3,8 +3,8 @@ require_once( 'thirdParty/fitbit/FitBitPHP.php' );
 
 class Fitbit{
 
-    const FITBIT_KEY ="fea407e2274949ca8d203987d50d156c";
-    const FITBIT_SECRET = "3bff1b5a660c46b5bf89e3a87530ece5";
+    const FITBIT_KEY = "c8cf145b20014baa9456c0d13f7c9ea8"; //fea407e2274949ca8d203987d50d156c";
+    const FITBIT_SECRET = "afe4c2eddfbf4390bb31726efdf5c2b3"; //3bff1b5a660c46b5bf89e3a87530ece5";
     const FITBIT_REQUEST_TOKEN_URL = "https://api.fitbit.com/oauth/request_token";
     const FITBIT_REQUEST_ACCESS_URL = "https://api.fitbit.com/oauth/access_token";
     const FITBIT_AUTHORIZE = "https://www.fitbit.com/oauth/authorize";
@@ -20,31 +20,24 @@ class Fitbit{
 
         $fitbit = new FitBitPHP( self::FITBIT_KEY, self::FITBIT_SECRET, 0, null, 'json', 0);
         $this->fitbitHandler = $fitbit;
-
-        if( isset( $_SESSION['fitbit_Session'] ) )
+        
+        if($this->IsAuthenticated()){
             $this->ContinueSession();
+        }
 
     }
 
     function StartSession(){
         $fitbit = $this->fitbitHandler;
         $fitbit->initSession('http://' . $_SERVER['HTTP_HOST'] ."/authorize");
-        
-        if( isset($_GET['oauth_token']) || isset($_GET['oauth_verifier'])){
-            if( isset($_GET['oauth_token'])){
-                $this->Set_oAuth_Token($_GET['oauth_verifier']);
-            }
-
-            if( isset($_GET['oauth_verifier'])){
-                $this->Set_oAuth_Verifier($_GET['oauth_verifier']);
-            }
-        }
     }
 
     function ContinueSession(){
         $fitbit = $this->fitbitHandler;
+        //$fitbit = $fitbit->reinit(self::FITBIT_KEY, self::FITBIT_SECRET);
         $fitbit->initSession('http://' . $_SERVER['HTTP_HOST'] ."/authorize");
-        if( !isset($this->activeDevice) && !isset($_SESSION['deviceID'])){
+        
+        if( (isset($fitbit) && $fitbit->sessionStatus() == 2) && !isset($this->activeDevice) && !isset($_SESSION['deviceID'])){
             $devices = $fitbit->getDevices();
             $this->PromptDevices($devices);
         }
@@ -77,7 +70,9 @@ class Fitbit{
     }
 
     function IsAuthenticated(){
-        if(isset($_SESSION['fitbit_Session']) && $_SESSION['fitbit_Session']==2 && $this->Get_oAuth_Token() != "" && $this->Get_oAuth_Verifier() !=""){
+        $fitbit = $this->fitbitHandler;
+        if($fitbit->sessionStatus() == 1 || $fitbit->sessionStatus() == 2){
+        //if(isset($_SESSION['fitbit_Session']) && $_SESSION['fitbit_Session']==2 && $this->Get_oAuth_Token() != "" && $this->Get_oAuth_Verifier() !=""){
             return true;
         }else{
             return false;
@@ -155,7 +150,7 @@ class Fitbit{
     function VerifyAlarm($alarmID){
         $alarms = $this->GetAlarms();
         foreach($alarms->trackerAlarms as $alarm){
-            if($alarm->alarmId == $alarmID && $alarm->enabled){
+            if($alarm->alarmId == $alarmID){
                 return true;
             }
         }

@@ -49,6 +49,7 @@ function startTimer(){
             if(result.success){
                 clock.start();
                 alarmID=result.alarmID;
+                updateSync(false);
                 checkIfAlarmIsSynced();
             }
         });
@@ -109,20 +110,14 @@ function checkForRunningAlarm(){
             var alarmOffset = result.time.substring(5);
             var alarmTime = result.time.substring(0,5) + ":00";
             var currentHour = nowTime.getHours();
-            if(currentHour.length == 1){
-                currentHour = 0 + "" + currentHour;
-            }
             var currentMinutes = nowTime.getMinutes();
-            if(currentMinutes.length == 1){
-                currentMinutes = 0 + "" + currentMinutes;
-            }
-            
             var currentSeconds = nowTime.getSeconds();
-            if(currentSeconds.length == 1){
-                currentSeconds = 0 + "" + currentSeconds;
-            }
             
-            var currentTime = currentHour + ":" + currentMinutes + ":" + currentSeconds;
+            currentHour = "00" + parseInt(currentHour);
+            currentMinutes = "00" + parseInt(currentMinutes);
+            currentSeconds = "00" + currentSeconds;
+            
+            var currentTime = currentHour.substring(currentHour.length-2) + ":" + currentMinutes.substring(currentMinutes.length-2) + ":" + currentSeconds.substring(currentSeconds.length-2);
             
             var diff = 0;
             if(alarmOffset == hourOffset){
@@ -131,7 +126,7 @@ function checkForRunningAlarm(){
                 diff = secondsDiffConvertTimezones(alarmTime, alarmOffset, currentTime, hourOffset);
             }
             
-            console.log(diff);
+            //console.log(diff);
             
             if(diff<0){
                 //If the alarm has passed delete the alarm
@@ -202,6 +197,8 @@ function secondsDiffConvertTimezones(time1, offset1, time2, offset2){
 }
 
 function secondsDiff(time1, time2){
+    console.log(time1);
+    console.log(time2);
     var t1 = timeToSeconds(time1);
     var t2 = timeToSeconds(time2);
     return t1 - t2;
