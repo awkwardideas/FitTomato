@@ -2,7 +2,7 @@
     <div class="col-md-12 col-lg-10 col-lg-offset-1">
         <div class="row">
             <div class="col-xs-12 pull-center">
-                <div class="btn-group options" data-toggle="buttons">
+                <div class="btn-group btn-group-sm options" data-toggle="buttons">
                     <label class="btn btn-sm btn-info active">
                         <input type="radio" name="options" id="pomodoro"  data-time-value="1500"> Pomodoro
                     </label>
