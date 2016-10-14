@@ -63,11 +63,13 @@ class Fitbit{
         if($this->GetActiveDeviceID() != null){
             $this->UnsetActiveDeviceID();
         }
-        $fitbit = $this->fitbitHandler;
-        $_SESSION['fitbit_Session']=0;
-        $fitbit->resetSession();
         $this->Set_oAuth_Token("");
         $this->Set_oAuth_Verifier("");
+        $fitbit = $this->fitbitHandler;
+        if($fitbit->sessionStatus() != 0){
+            $_SESSION['fitbit_Session']=0;
+            $fitbit->resetSession();
+        }
     }
 
     function GetProfile(){

@@ -1,12 +1,12 @@
 //Requires jQuery and Bootstrap
 var Bootstrap_Messages = (function() {
-	// "Private" variables
+	// "Private" variables 
 	var delayTime = 5000;        
                 
 	// constructor
 	function Bootstrap_Messages(){
-            if($(".bootstrap-message-container").length == 0){
-                var msgBox = $("<div/>").addClass("bootstrap-message-container");
+            if($("#bootstrap-message-container").length == 0){
+                var msgBox = $("<div/>").attr("id", "bootstrap-message-container");
                         msgBox.css("position","fixed").css("top","20px").css("right","20px").css("z-index","9999");
                 $("body").prepend(msgBox);
             }
@@ -37,7 +37,7 @@ var Bootstrap_Messages = (function() {
 		var msgBox = $("<div/>").addClass("alert alert-dismissable alert-"+type);
                 var msgDismiss = $("<button/>").addClass("close").attr("type","button").attr("data-dismiss","alert").attr("aria-hidden","true").html("&times;").appendTo(msgBox);
                 $(msgBox).append(msg);
-		$(msgBox).appendTo(".bootstrap-message-container").delay(delayTime).animate(
+		$(msgBox).appendTo("#bootstrap-message-container").delay(delayTime).animate(
 			{opacity: .01},
 			'normal',
 			function() {

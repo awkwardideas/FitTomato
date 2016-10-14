@@ -15,7 +15,15 @@ $(function(){
     clock = $('.countDown').FlipClock(timeSet, {
         countdown: true,
         clockFace: 'MinuteCounter',
-        autoStart: false
+        autoStart: false,
+    });
+    
+    clock.start(function() {
+       timerStarted(); 
+    });
+    
+    clock.stop(function() {
+       timerStoppted(); 
     });
     
     checkForRunningAlarm(true);
@@ -41,52 +49,11 @@ function updateSync(isSynced){
 }
 
 function startTimer(){
-    if(!clock.running){
-        var requestURL = "/start";
-        
-        var request = $.ajax({
-            type: "POST",
-            url: requestURL,
-            data: {seconds:clock.time.time},
-            dataType: "json"
-        });
-        request.done(function(result) {
-            if(result.success){
-                bootstrapMsg.addSuccess("Silent alarm added to Fitbit");
-                clock.start();
-                alarmID=result.alarmID;
-                updateSync(false);
-                checkIfAlarmIsSynced();
-            }
-        });
-        request.fail(function( jqXHR, textStatus ) {
-            bootstrapMsg.addWarning("Alarm did not start successfully");
-            return false;
-        });
-    }
+    clock.start();
 }
 
 function stopTimer(){
-    if(clock.running){
-        var requestURL = "/stop";
-        
-        var request = $.ajax({
-            type: "POST",
-            url: requestURL,
-            dataType: "json"
-        });
-        request.done(function(result) {
-            if(result.success){
-                clock.stop();
-                bootstrapMsg.addSuccess("Silent alarm deleted on Fitbit");
-                alarmID=null;
-            }
-        });
-        request.fail(function( jqXHR, textStatus ) {
-            bootstrapMsg.addWarning("Alarm did not stop successfully");
-            return false;
-        });
-    }
+    clock.stop();
 }
 
 function resetTimer(){
@@ -97,6 +64,51 @@ function setTimer(time){
     timeSet = time;
     stopTimer();
     resetTimer();
+}
+
+function timerStarted(){
+    var requestURL = "/start";
+
+    var request = $.ajax({
+        type: "POST",
+        url: requestURL,
+        data: {seconds:clock.time.time},
+        dataType: "json"
+    });
+    request.done(function(result) {
+        if(result.success){
+            bootstrapMsg.addSuccess("Silent alarm added to Fitbit");
+            clock.start();
+            alarmID=result.alarmID;
+            updateSync(false);
+            checkIfAlarmIsSynced();
+        }
+    });
+    request.fail(function( jqXHR, textStatus ) {
+        bootstrapMsg.addWarning("Alarm did not start successfully");
+        return false;
+    });
+}
+
+function timerStopped(){
+    var requestURL = "/stop";
+
+    var request = $.ajax({
+        type: "POST",
+        url: requestURL,
+        dataType: "json"
+    });
+    request.done(function(result) {
+        if(result.success){
+            clock.stop();
+            bootstrapMsg.addSuccess("Silent alarm deleted on Fitbit");
+            alarmID=null;
+        }
+    });
+    request.fail(function( jqXHR, textStatus ) {
+        bootstrapMsg.addWarning("Alarm did not stop successfully");
+        return false;
+    });
 }
 
 function checkForRunningAlarm(newLoad){
